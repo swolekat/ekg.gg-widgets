@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ekg.gg/schemas/manifest.json",
+  "name": "fart",
+  "version": "1.0.0",
+  "description": "Make a fart noise and image appear with a command",
+  "template": "template.hbs",
+  "css": "styles.css",
+  "js": "script.ts",
+  "assets": {
+    "fartImage": {
+      "type": "image",
+      "file": "fart.png"
+    },
+    "fartSound": {
+      "type": "audio",
+      "file": "sound.mp3"
+    }
+  },
+  "settings": {
+    "fartCommand": {
+      "type": "string",
+      "name": "Command",
+      "description": "What people type in chat",
+      "default": "!fart"
+    },
+    "privileges": {
+      "name": "Privileges",
+      "type": "string",
+      "description": "Who can use the command",
+      "default": "everybody",
+      "choices": {
+        "everybody": "Everybody",
+        "justSubs": "Subs",
+        "subs": "Subs + VIPs + Mods",
+        "vips": "VIPs + Mods",
+        "mods": "Mods",
+        "broadcaster": "Broadcaster"
+      }
+    }
+  }
+}

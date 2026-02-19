@@ -1,0 +1,13 @@
+{
+  "name": "fart",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "ekg dev",
+    "build": "ekg build",
+    "sync": "ekg sync"
+  },
+  "devDependencies": {
+    "@ekg_gg/devkit": "latest"
+  }
+}
