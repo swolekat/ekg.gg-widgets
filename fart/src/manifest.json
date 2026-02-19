@@ -3,8 +3,8 @@
   "name": "fart",
   "version": "1.0.0",
   "description": "Make a fart noise and image appear with a command",
-  "template": "template.hbs",
-  "css": "styles.css",
+  "template": "template.html.hbs",
+  "css": "styles.css.hbs",
   "js": "script.ts",
   "assets": {
     "fartImage": {

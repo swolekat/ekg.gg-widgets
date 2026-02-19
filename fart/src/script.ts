@@ -1,67 +1,63 @@
-type State = {}
-
-
-const checkPrivileges = (event, privileges) => {
-    const {isModerator, isBroadcaster, isVip, isSubscriber} = event;
-    if (isBroadcaster) return true;
-    if (privileges === "justSubs" && isSubscriber) return true;
-    if (privileges === "mods" && isModerator) return true;
-    if (privileges === "vips" && (isModerator || isVip)) return true;
-    if (privileges === "subs" && (isModerator || isVip || isSubscriber)) return true;
-    return privileges === "everybody";
+type State = {
+  fart: {
+    id: number;
+    top: number;
+    left: number;
+    shownAt: number;
+  } | null;
 };
 
-const fartSize = 200;
-let timeout;
+const FART_SIZE = 200;
+const FART_DURATION = 10000;
 
-const hide = () => {
-    const fart = document.getElementById('fart');
-    fart.className = 'fart hidden';
+const checkPrivileges = (
+  data: EKG.ChatSent["data"],
+  privileges: string
+): boolean => {
+  const { isModerator, isBroadcaster, isVip, isSubscriber } = data;
+  if (isBroadcaster) return true;
+  if (privileges === "justSubs" && isSubscriber) return true;
+  if (privileges === "mods" && isModerator) return true;
+  if (privileges === "vips" && (isModerator || isVip)) return true;
+  if (privileges === "subs" && (isModerator || isVip || isSubscriber))
+    return true;
+  return privileges === "everybody";
 };
 
-const doFart = () => {
-    if(timeout){
-        clearTimeout(timeout);
-        timeout = undefined;
-    }
-    hide();
-    const mainContainer = document.getElementById('main-container');
-    const fart = document.getElementById('fart');
-    const sound = document.getElementById('sound') as HTMLAudioElement;
-    const {height, width} = mainContainer.getBoundingClientRect();
-    fart.style.top = `${Math.random() * (height - fartSize)}px`;
-    fart.style.left = `${Math.random() * (width - fartSize)}px`;
-    fart.className = 'fart';
-    sound.play();
-    timeout = setTimeout(() => {
-        hide();
-    }, 10000);
-};
-
-
-const addMessage = (event: EKG.ChatSent, state: State, ctx: EKG.WidgetContext) => {
-    const {message} = event;
-    const {fartCommand, privileges} = ctx.settings;
-    console.log(window.JSON.stringify(ctx));
-    console.log(window.JSON.stringify(ctx.settings));
-    const textStartsWithCommand = message.startsWith(fartCommand);
-    if(!textStartsWithCommand || !checkPrivileges(event, privileges)){
-        return;
-    }
-
-    doFart();
-
-  return { ...state }
-};
-
-
-EKG.widget('fart')
-    .initialState<State>((ctx, initial) => ({}))
-    .register((event, state, ctx) => {
-        switch (event.type) {
-            case 'ekg.chat.sent':
-                addMessage(event, state, ctx);
-                return state;
+EKG.widget("fart")
+  .initialState<State>(() => ({
+    fart: null,
+  }))
+  .register((event, state, ctx) => {
+    switch (event.type) {
+      case "ekg.chat.sent": {
+        const { fartCommand, privileges } = ctx.settings;
+        const text = EKG.utils.chatToText(event.data.message);
+        if (
+          !text.startsWith(fartCommand) ||
+          !checkPrivileges(event.data, privileges)
+        ) {
+          return state;
         }
-        return state
-    });
+        const top = ctx.random() * (ctx.size.height - FART_SIZE);
+        const left = ctx.random() * (ctx.size.width - FART_SIZE);
+        return {
+          ...state,
+          fart: {
+            id: (state.fart?.id ?? 0) + 1,
+            top,
+            left,
+            shownAt: ctx.now,
+          },
+        };
+      }
+      case "TICK": {
+        if (state.fart && ctx.now - state.fart.shownAt > FART_DURATION) {
+          return { ...state, fart: null };
+        }
+        return state;
+      }
+      default:
+        return state;
+    }
+  });
