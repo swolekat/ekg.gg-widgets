@@ -8,6 +8,6 @@
     "sync": "ekg sync"
   },
   "devDependencies": {
-    "@ekg_gg/devkit": "^0.0.28"
+    "@ekg_gg/devkit": "^0.0.31"
   }
 }
